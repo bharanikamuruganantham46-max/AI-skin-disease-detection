@@ -1,0 +1,2994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Skin Disease Detection</title>
+
+<style>
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:linear-gradient(135deg,#eef2ff,#f8fafc);
+color:#1e293b;
+}
+
+.navbar{
+position:sticky;
+top:0;
+z-index:1000;
+background:white;
+padding:15px 5%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 3px 15px rgba(0,0,0,0.08);
+}
+
+.logo{
+font-size:20px;
+font-weight:bold;
+color:#3730a3;
+}
+
+.nav-links{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+justify-content:center;
+align-items:center;
+}
+
+.nav-links a{
+text-decoration:none;
+color:#334155;
+font-weight:bold;
+padding:9px 12px;
+border-radius:10px;
+}
+
+.nav-links a:hover{
+background:#eef2ff;
+color:#3730a3;
+}
+
+.language-select{
+padding:9px 12px;
+border:1px solid #c7d2fe;
+border-radius:10px;
+background:#eef2ff;
+color:#3730a3;
+font-weight:bold;
+cursor:pointer;
+}
+
+.container{
+width:92%;
+max-width:950px;
+margin:25px auto;
+}
+
+.header{
+background:white;
+padding:30px;
+border-radius:20px;
+text-align:center;
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
+}
+
+.header h1{
+color:#3730a3;
+margin:0 0 10px;
+}
+
+.header p{
+color:#64748b;
+line-height:1.6;
+}
+
+.card{
+background:white;
+margin-top:20px;
+padding:25px;
+border-radius:20px;
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
+}
+
+.card h2{
+color:#3730a3;
+}
+
+.dashboard-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+margin-top:20px;
+}
+
+.dashboard-box{
+padding:20px;
+border-radius:16px;
+background:#f8fafc;
+border:1px solid #e2e8f0;
+text-align:center;
+}
+
+.dashboard-icon{font-size:30px;}
+
+.dashboard-title{
+font-size:14px;
+color:#64748b;
+margin-top:8px;
+}
+
+.dashboard-value{
+font-size:25px;
+font-weight:bold;
+color:#3730a3;
+margin-top:8px;
+word-break:break-word;
+}
+
+.dashboard-note{
+text-align:center;
+color:#64748b;
+font-size:13px;
+margin-top:15px;
+}
+
+.about-box{
+line-height:1.7;
+color:#475569;
+}
+
+.about-list{
+padding-left:22px;
+}
+
+.about-list li{
+margin:8px 0;
+}
+
+.camera-box{text-align:center;}
+
+#camera{
+width:100%;
+max-width:500px;
+height:350px;
+background:#111827;
+border-radius:18px;
+object-fit:cover;
+display:none;
+margin:20px auto;
+}
+
+#capturedImage{
+width:100%;
+max-width:500px;
+max-height:350px;
+object-fit:contain;
+border-radius:18px;
+display:none;
+margin:20px auto;
+}
+
+.upload-area{
+text-align:center;
+padding:25px;
+border:2px dashed #818cf8;
+border-radius:16px;
+}
+
+#imageUpload{
+margin-top:15px;
+}
+
+#previewImage{
+display:none;
+width:100%;
+max-width:400px;
+max-height:350px;
+object-fit:contain;
+margin:20px auto;
+border-radius:18px;
+}
+
+button{
+border:none;
+padding:13px 22px;
+border-radius:12px;
+margin:7px 4px;
+font-size:15px;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:disabled{
+opacity:0.6;
+cursor:not-allowed;
+}
+
+.camera-button{background:#0f766e;color:white;}
+.capture-button{background:#ea580c;color:white;}
+.analyze-button{background:#4f46e5;color:white;}
+.reset-button{background:#e2e8f0;color:#1e293b;}
+.history-button{background:#7c3aed;color:white;}
+.print-button{background:#0891b2;color:white;}
+.clear-button{background:#dc2626;color:white;}
+.profile-button{background:#16a34a;color:white;}
+
+#status{
+text-align:center;
+margin-top:15px;
+font-weight:bold;
+}
+
+.loading{color:#4f46e5;}
+.success{color:#16a34a;}
+.error{color:#dc2626;}
+
+/* PATIENT PROFILE */
+
+.profile-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+margin-top:15px;
+}
+
+.profile-field{
+display:flex;
+flex-direction:column;
+}
+
+.profile-field label{
+font-weight:bold;
+color:#334155;
+margin-bottom:7px;
+}
+
+.profile-field input,
+.profile-field select,
+.profile-field textarea{
+width:100%;
+padding:12px;
+border:1px solid #cbd5e1;
+border-radius:10px;
+font-size:15px;
+font-family:Arial,sans-serif;
+outline:none;
+}
+
+.profile-field input:focus,
+.profile-field select:focus,
+.profile-field textarea:focus{
+border-color:#6366f1;
+}
+
+.profile-field textarea{
+min-height:90px;
+resize:vertical;
+}
+
+.profile-full{
+grid-column:1 / -1;
+}
+
+.profile-message{
+text-align:center;
+font-weight:bold;
+margin-top:10px;
+color:#16a34a;
+}
+
+/* PATIENT REPORT */
+
+.patient-info{
+margin-bottom:25px;
+padding:20px;
+border-radius:16px;
+background:#eef2ff;
+border:1px solid #c7d2fe;
+}
+
+.patient-info h3{
+margin-top:0;
+color:#3730a3;
+}
+
+.patient-info-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+
+.patient-info-item{
+padding:10px;
+background:white;
+border-radius:10px;
+}
+
+.patient-info-item strong{
+display:block;
+color:#64748b;
+font-size:13px;
+margin-bottom:4px;
+}
+
+.patient-notes{
+grid-column:1 / -1;
+}
+
+/* IMAGE QUALITY CHECK */
+
+.quality-box{
+display:none;
+margin-top:20px;
+padding:18px;
+border-radius:16px;
+text-align:center;
+border:1px solid #e2e8f0;
+background:#f8fafc;
+}
+
+.quality-title{
+font-size:18px;
+font-weight:bold;
+color:#3730a3;
+margin-bottom:10px;
+}
+
+.quality-message{
+font-size:15px;
+line-height:1.5;
+font-weight:bold;
+}
+
+.quality-good{
+color:#16a34a;
+}
+
+.quality-warning{
+color:#dc2626;
+}
+
+#resultSection{display:none;}
+
+.report-box{
+background:#f8fafc;
+padding:20px;
+border-radius:16px;
+border:1px solid #e2e8f0;
+}
+
+.disease{
+font-size:30px;
+font-weight:bold;
+color:#dc2626;
+margin-bottom:15px;
+}
+
+.confidence{
+font-size:22px;
+font-weight:bold;
+color:#4f46e5;
+}
+
+.info-section{margin-top:20px;}
+
+.info-section h3{color:#3730a3;}
+
+.info-section li{margin:8px 0;}
+
+.health-card{
+margin-top:25px;
+padding:22px;
+text-align:center;
+border-radius:18px;
+background:#eef2ff;
+border:1px solid #c7d2fe;
+}
+
+#healthScore{
+font-size:44px;
+font-weight:bold;
+color:#4f46e5;
+margin:12px;
+}
+
+#healthStatus{
+font-size:18px;
+font-weight:bold;
+}
+
+.health-note{
+color:#64748b;
+font-size:13px;
+line-height:1.5;
+}
+
+#historySection{display:none;}
+
+.history-item{
+background:#f8fafc;
+padding:16px;
+border-radius:15px;
+border:1px solid #e2e8f0;
+margin-top:12px;
+}
+
+.history-item h3{
+color:#3730a3;
+margin-top:0;
+}
+
+.history-item p{margin:7px 0;}
+
+.history-date{
+color:#64748b;
+font-size:13px;
+}
+
+.no-history{
+text-align:center;
+color:#64748b;
+padding:20px;
+}
+
+.footer{
+text-align:center;
+margin:30px;
+color:#64748b;
+font-size:13px;
+}
+
+.print-header{
+display:none;
+text-align:center;
+border-bottom:2px solid #333;
+padding-bottom:15px;
+margin-bottom:20px;
+}
+
+.print-header h1{margin:0;}
+.print-header p{margin:5px 0;}
+
+@media print{
+
+body{background:white;}
+
+.navbar,
+#home,
+#about,
+#dashboardSection,
+#cameraSection,
+#uploadSection,
+#historySection,
+.footer,
+#status,
+#analyzeButton,
+.reset-button,
+.history-button,
+.print-button,
+.quality-box{
+display:none !important;
+}
+
+.container{
+width:100%;
+max-width:none;
+margin:0;
+}
+
+#resultSection{
+display:block !important;
+box-shadow:none;
+margin:0;
+padding:20px;
+}
+
+.report-box{
+border:1px solid #333;
+background:white;
+}
+
+.print-header{
+display:block !important;
+}
+
+.patient-info{
+background:white;
+border:1px solid #333;
+}
+}
+
+@media(max-width:650px){
+
+.navbar{
+flex-direction:column;
+gap:10px;
+}
+
+.nav-links{flex-wrap:wrap;}
+
+.nav-links a{
+font-size:12px;
+padding:8px;
+}
+
+.card{padding:20px;}
+
+.dashboard-grid,
+.profile-grid,
+.patient-info-grid{
+grid-template-columns:1fr;
+}
+
+.profile-full,
+.patient-notes{
+grid-column:auto;
+}
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+
+<div class="logo">
+🩺 <span data-en="Skin AI" data-ta="ஸ்கின் AI">Skin AI</span>
+</div>
+
+<div class="nav-links">
+
+<a href="#home">
+🏠 <span data-en="Home" data-ta="முகப்பு">Home</span>
+</a>
+
+<a href="#dashboardSection">
+📊 <span data-en="Dashboard" data-ta="டாஷ்போர்டு">Dashboard</span>
+</a>
+
+<a href="#about">
+ℹ️ <span data-en="About" data-ta="பற்றி">About</span>
+</a>
+
+<a href="#cameraSection">
+📷 <span data-en="Camera" data-ta="கேமரா">Camera</span>
+</a>
+
+<a href="#uploadSection">
+🖼️ <span data-en="Upload" data-ta="பதிவேற்றம்">Upload</span>
+</a>
+
+<a href="#historySection" onclick="showHistory()">
+📜 <span data-en="History" data-ta="வரலாறு">History</span>
+</a>
+
+<select class="language-select" id="languageSelect" onchange="changeLanguage(this.value)">
+<option value="en">🇬🇧 English</option>
+<option value="ta">🇮🇳 தமிழ்</option>
+</select>
+
+</div>
+</nav>
+
+<div class="container">
+
+<section id="home">
+
+<div class="header">
+
+<h1>
+🩺
+<span
+data-en="AI Skin Disease Detection"
+data-ta="AI தோல் நோய் கண்டறிதல்">
+AI Skin Disease Detection
+</span>
+</h1>
+
+<p
+data-en="An AI-powered educational system that analyzes a skin image and provides a possible skin-condition classification, confidence score and general information."
+data-ta="தோல் படத்தை AI மூலம் பகுப்பாய்வு செய்து, சாத்தியமான தோல் நிலை, நம்பகத்தன்மை மதிப்பெண் மற்றும் பொதுவான தகவல்களை வழங்கும் கல்வி அமைப்பு.">
+An AI-powered educational system that analyzes a skin image and provides a possible skin-condition classification, confidence score and general information.
+</p>
+
+</div>
+</section>
+
+
+<section id="dashboardSection">
+
+<div class="card">
+
+<h2>
+📊
+<span
+data-en="AI Analysis Dashboard"
+data-ta="AI பகுப்பாய்வு டாஷ்போர்டு">
+AI Analysis Dashboard
+</span>
+</h2>
+
+<p
+data-en="Overview of your previous skin image analyses."
+data-ta="உங்கள் முந்தைய தோல் பட பகுப்பாய்வுகளின் கண்ணோட்டம்.">
+Overview of your previous skin image analyses.
+</p>
+
+<div class="dashboard-grid">
+
+<div class="dashboard-box">
+<div class="dashboard-icon">🔢</div>
+<div
+class="dashboard-title"
+data-en="Total Analyses"
+data-ta="மொத்த பகுப்பாய்வுகள்">
+Total Analyses
+</div>
+<div class="dashboard-value" id="totalAnalyses">0</div>
+</div>
+
+<div class="dashboard-box">
+<div class="dashboard-icon">📈</div>
+<div
+class="dashboard-title"
+data-en="Average Confidence"
+data-ta="சராசரி நம்பகத்தன்மை">
+Average Confidence
+</div>
+<div class="dashboard-value" id="averageConfidence">0%</div>
+</div>
+
+<div class="dashboard-box">
+<div class="dashboard-icon">🩺</div>
+<div
+class="dashboard-title"
+data-en="Most Detected Condition"
+data-ta="அதிகம் கண்டறியப்பட்ட நிலை">
+Most Detected Condition
+</div>
+<div class="dashboard-value" id="mostDetected">-</div>
+</div>
+
+<div class="dashboard-box">
+<div class="dashboard-icon">🕐</div>
+<div
+class="dashboard-title"
+data-en="Latest Analysis"
+data-ta="சமீபத்திய பகுப்பாய்வு">
+Latest Analysis
+</div>
+<div class="dashboard-value" id="latestAnalysis">-</div>
+</div>
+
+</div>
+
+<p
+class="dashboard-note"
+data-en="Dashboard values are automatically updated after each AI analysis."
+data-ta="ஒவ்வொரு AI பகுப்பாய்விற்குப் பிறகும் டாஷ்போர்டு தானாக புதுப்பிக்கப்படும்.">
+Dashboard values are automatically updated after each AI analysis.
+</p>
+
+</div>
+</section>
+
+
+<section id="about">
+
+<div class="card">
+
+<h2>
+ℹ️
+<span
+data-en="About This Project"
+data-ta="இந்த திட்டத்தைப் பற்றி">
+About This Project
+</span>
+</h2>
+
+<div class="about-box">
+
+<p
+data-en="This project uses Artificial Intelligence and image classification to analyze uploaded or camera-captured skin images."
+data-ta="இந்த திட்டம் செயற்கை நுண்ணறிவு மற்றும் பட வகைப்படுத்தலைப் பயன்படுத்தி பதிவேற்றப்பட்ட அல்லது கேமராவில் எடுக்கப்பட்ட தோல் படங்களை பகுப்பாய்வு செய்கிறது.">
+This project uses Artificial Intelligence and image classification to analyze uploaded or camera-captured skin images.
+</p>
+
+<ul class="about-list">
+
+<li
+data-en="📷 Capture a skin image using the camera."
+data-ta="📷 கேமராவைப் பயன்படுத்தி தோல் படத்தை எடுக்கவும்.">
+📷 Capture a skin image using the camera.
+</li>
+
+<li
+data-en="🖼️ Upload an existing skin image."
+data-ta="🖼️ ஏற்கனவே உள்ள தோல் படத்தை பதிவேற்றவும்.">
+🖼️ Upload an existing skin image.
+</li>
+
+<li
+data-en="🤖 AI analyzes the image."
+data-ta="🤖 AI படத்தை பகுப்பாய்வு செய்கிறது.">
+🤖 AI analyzes the image.
+</li>
+
+<li
+data-en="📊 Shows the predicted condition and confidence."
+data-ta="📊 கணிக்கப்பட்ட நிலை மற்றும் நம்பகத்தன்மையைக் காட்டுகிறது.">
+📊 Shows the predicted condition and confidence.
+</li>
+
+<li
+data-en="🩹 Provides general symptoms and precautions."
+data-ta="🩹 பொதுவான அறிகுறிகள் மற்றும் முன்னெச்சரிக்கைகளை வழங்குகிறது.">
+🩹 Provides general symptoms and precautions.
+</li>
+
+<li
+data-en="⭐ Shows an educational Skin Health Score."
+data-ta="⭐ கல்வி நோக்கத்திற்கான Skin Health Score-ஐ காட்டுகிறது.">
+⭐ Shows an educational Skin Health Score.
+</li>
+
+<li
+data-en="📜 Saves previous analysis results in History."
+data-ta="📜 முந்தைய பகுப்பாய்வு முடிவுகளை History-ல் சேமிக்கிறது.">
+📜 Saves previous analysis results in History.
+</li>
+
+<li
+data-en="👤 Stores patient profile information for the analysis report."
+data-ta="👤 பகுப்பாய்வு அறிக்கைக்காக நோயாளர் விவரங்களை சேமிக்கிறது.">
+👤 Stores patient profile information for the analysis report.
+</li>
+
+</ul>
+
+<p>
+
+<strong
+data-en="Important:"
+data-ta="முக்கியம்:">
+Important:
+</strong>
+
+<span
+data-en="This system is for educational and project demonstration purposes only. It does not provide a medical diagnosis. For medical concerns, consult a qualified dermatologist."
+data-ta="இந்த அமைப்பு கல்வி மற்றும் திட்ட விளக்கத்திற்காக மட்டுமே. இது மருத்துவ நோயறிதலை வழங்காது. மருத்துவப் பிரச்சினைகளுக்கு தகுதியான தோல் மருத்துவரை அணுகவும்.">
+This system is for educational and project demonstration purposes only. It does not provide a medical diagnosis. For medical concerns, consult a qualified dermatologist.
+</span>
+
+</p>
+
+</div>
+</div>
+</section>
+
+
+<!-- PATIENT PROFILE -->
+
+<section id="patientProfileSection">
+
+<div class="card">
+
+<h2>
+👤
+<span
+data-en="Patient Profile"
+data-ta="நோயாளர் விவரம்">
+Patient Profile
+</span>
+</h2>
+
+<p
+data-en="Enter basic patient information before starting the skin analysis."
+data-ta="தோல் பகுப்பாய்வை தொடங்குவதற்கு முன் அடிப்படை நோயாளர் விவரங்களை உள்ளிடவும்.">
+Enter basic patient information before starting the skin analysis.
+</p>
+
+<div class="profile-grid">
+
+<div class="profile-field">
+
+<label
+for="patientName"
+data-en="Patient Name"
+data-ta="நோயாளியின் பெயர்">
+Patient Name
+</label>
+
+<input
+type="text"
+id="patientName"
+placeholder="Enter patient name">
+</div>
+
+
+<div class="profile-field">
+
+<label
+for="patientAge"
+data-en="Age"
+data-ta="வயது">
+Age
+</label>
+
+<input
+type="number"
+id="patientAge"
+min="1"
+max="120"
+placeholder="Enter age">
+</div>
+
+
+<div class="profile-field">
+
+<label
+for="patientGender"
+data-en="Gender"
+data-ta="பாலினம்">
+Gender
+</label>
+
+<select id="patientGender">
+
+<option value="">
+Select Gender
+</option>
+
+<option
+value="Male"
+data-en="Male"
+data-ta="ஆண்">
+Male
+</option>
+
+<option
+value="Female"
+data-en="Female"
+data-ta="பெண்">
+Female
+</option>
+
+<option
+value="Other"
+data-en="Other"
+data-ta="மற்றவை">
+Other
+</option>
+
+</select>
+
+</div>
+
+
+<div class="profile-field">
+
+<label
+for="patientContact"
+data-en="Contact Number"
+data-ta="தொடர்பு எண்">
+Contact Number
+</label>
+
+<input
+type="tel"
+id="patientContact"
+placeholder="Optional">
+</div>
+
+
+<div class="profile-field profile-full">
+
+<label
+for="patientNotes"
+data-en="Notes"
+data-ta="குறிப்புகள்">
+Notes
+</label>
+
+<textarea
+id="patientNotes"
+placeholder="Optional notes"></textarea>
+
+</div>
+
+</div>
+
+<div style="text-align:center;">
+
+<button
+class="profile-button"
+onclick="savePatientProfile()">
+
+💾
+<span
+data-en="Save Profile"
+data-ta="விவரங்களை சேமிக்க">
+Save Profile
+</span>
+
+</button>
+
+</div>
+
+<div
+id="profileMessage"
+class="profile-message">
+</div>
+
+</div>
+</section>
+
+
+<!-- CAMERA -->
+
+<section id="cameraSection">
+
+<div class="card camera-box">
+
+<h2>
+📷
+<span
+data-en="Camera Detection"
+data-ta="கேமரா மூலம் கண்டறிதல்">
+Camera Detection
+</span>
+</h2>
+
+<p
+data-en="Take a clear close-up image of the affected skin area."
+data-ta="பாதிக்கப்பட்ட தோல் பகுதியின் தெளிவான நெருக்கமான படத்தை எடுக்கவும்.">
+Take a clear close-up image of the affected skin area.
+</p>
+
+<video id="camera" autoplay playsinline></video>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+<img id="capturedImage" alt="Captured Image">
+
+<div>
+
+<button
+class="camera-button"
+id="openCameraButton"
+onclick="openCamera()">
+📷
+<span
+data-en="Open Camera"
+data-ta="கேமராவை திறக்கவும்">
+Open Camera
+</span>
+</button>
+
+<button
+class="capture-button"
+id="captureButton"
+onclick="capturePhoto()"
+style="display:none;">
+📸
+<span
+data-en="Capture Image"
+data-ta="படம் எடுக்கவும்">
+Capture Image
+</span>
+</button>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- UPLOAD -->
+
+<section id="uploadSection">
+
+<div class="card">
+
+<h2>
+🖼️
+<span
+data-en="Upload Skin Image"
+data-ta="தோல் படத்தை பதிவேற்றவும்">
+Upload Skin Image
+</span>
+</h2>
+
+<div class="upload-area">
+
+<p
+data-en="Choose a skin image from your device."
+data-ta="உங்கள் சாதனத்திலிருந்து தோல் படத்தை தேர்ந்தெடுக்கவும்.">
+Choose a skin image from your device.
+</p>
+
+<input
+type="file"
+id="imageUpload"
+accept="image/*">
+
+</div>
+
+<img
+id="previewImage"
+alt="Image Preview">
+
+</div>
+</section>
+
+
+<!-- IMAGE QUALITY CHECK -->
+
+<div class="card">
+
+<div
+class="quality-box"
+id="qualityBox">
+
+<div class="quality-title">
+
+🔍
+
+<span
+data-en="Image Quality Check"
+data-ta="படத்தின் தர சரிபார்ப்பு">
+Image Quality Check
+</span>
+
+</div>
+
+<div
+class="quality-message"
+id="qualityMessage">
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ANALYZE -->
+
+<div class="card">
+
+<div style="text-align:center;">
+
+<button
+class="analyze-button"
+id="analyzeButton"
+onclick="analyzeSkin()">
+
+🔬
+<span
+data-en="Analyze Skin"
+data-ta="தோலை பகுப்பாய்வு செய்யவும்">
+Analyze Skin
+</span>
+
+</button>
+
+<button
+class="reset-button"
+onclick="resetPage()">
+
+🔄
+<span
+data-en="Try Another Image"
+data-ta="வேறு படம் முயற்சிக்கவும்">
+Try Another Image
+</span>
+
+</button>
+
+<button
+class="history-button"
+onclick="showHistory()">
+
+📜
+<span
+data-en="View History"
+data-ta="வரலாற்றைக் காண்க">
+View History
+</span>
+
+</button>
+
+</div>
+
+<div id="status"></div>
+
+</div>
+
+
+<!-- RESULT -->
+
+<div
+class="card"
+id="resultSection">
+
+<div class="print-header">
+
+<h1>🩺 AI Skin Disease Detection</h1>
+
+<p>AI Analysis Report</p>
+
+<p id="printDate"></p>
+
+</div>
+
+
+<h2>
+
+📋
+
+<span
+data-en="AI Analysis Report"
+data-ta="AI பகுப்பாய்வு அறிக்கை">
+AI Analysis Report
+</span>
+
+</h2>
+
+
+<div class="report-box">
+
+
+<!-- PATIENT INFORMATION -->
+
+<div
+class="patient-info">
+
+<h3>
+
+👤
+
+<span
+data-en="Patient Information"
+data-ta="நோயாளர் தகவல்">
+Patient Information
+</span>
+
+</h3>
+
+<div class="patient-info-grid">
+
+<div class="patient-info-item">
+
+<strong
+data-en="Patient Name"
+data-ta="நோயாளியின் பெயர்">
+Patient Name
+</strong>
+
+<span id="reportPatientName">-</span>
+
+</div>
+
+
+<div class="patient-info-item">
+
+<strong
+data-en="Age"
+data-ta="வயது">
+Age
+</strong>
+
+<span id="reportPatientAge">-</span>
+
+</div>
+
+
+<div class="patient-info-item">
+
+<strong
+data-en="Gender"
+data-ta="பாலினம்">
+Gender
+</strong>
+
+<span id="reportPatientGender">-</span>
+
+</div>
+
+
+<div class="patient-info-item">
+
+<strong
+data-en="Contact Number"
+data-ta="தொடர்பு எண்">
+Contact Number
+</strong>
+
+<span id="reportPatientContact">-</span>
+
+</div>
+
+
+<div class="patient-info-item patient-notes">
+
+<strong
+data-en="Notes"
+data-ta="குறிப்புகள்">
+Notes
+</strong>
+
+<span id="reportPatientNotes">-</span>
+
+</div>
+
+</div>
+</div>
+
+
+<p>
+
+<strong
+data-en="Detected Condition:"
+data-ta="கண்டறியப்பட்ட நிலை:">
+Detected Condition:
+</strong>
+
+</p>
+
+<div
+class="disease"
+id="diseaseName">
+-
+</div>
+
+
+<p>
+
+<strong
+data-en="Confidence:"
+data-ta="நம்பகத்தன்மை:">
+Confidence:
+</strong>
+
+</p>
+
+<div
+class="confidence"
+id="confidence">
+-
+</div>
+
+
+<div class="info-section">
+
+<h3>
+
+🩹
+
+<span
+data-en="Common Symptoms"
+data-ta="பொதுவான அறிகுறிகள்">
+Common Symptoms
+</span>
+
+</h3>
+
+<ul id="symptomsList"></ul>
+
+</div>
+
+
+<div class="info-section">
+
+<h3>
+
+🛡️
+
+<span
+data-en="Precautions"
+data-ta="முன்னெச்சரிக்கைகள்">
+Precautions
+</span>
+
+</h3>
+
+<ul id="precautionsList"></ul>
+
+</div>
+
+
+<div class="info-section">
+
+<h3>
+
+👨‍⚕️
+
+<span
+data-en="Doctor Recommendation"
+data-ta="மருத்துவர் பரிந்துரை">
+Doctor Recommendation
+</span>
+
+</h3>
+
+<p id="doctorAdvice">-</p>
+
+</div>
+
+
+<div class="health-card">
+
+<h3>
+
+⭐
+
+<span
+data-en="AI Skin Health Score"
+data-ta="AI தோல் ஆரோக்கிய மதிப்பெண்">
+AI Skin Health Score
+</span>
+
+</h3>
+
+<div
+id="healthScore">
+0/100
+</div>
+
+<div
+id="healthStatus"
+data-en="Waiting for analysis"
+data-ta="பகுப்பாய்விற்காக காத்திருக்கிறது">
+Waiting for analysis
+</div>
+
+<p
+class="health-note"
+data-en="This score is an educational image-analysis indicator. It is not a medical diagnosis."
+data-ta="இந்த மதிப்பெண் கல்வி நோக்கத்திற்கான பட பகுப்பாய்வு குறியீடு மட்டுமே. இது மருத்துவ நோயறிதல் அல்ல.">
+This score is an educational image-analysis indicator. It is not a medical diagnosis.
+</p>
+
+</div>
+
+</div>
+
+
+<div style="text-align:center;margin-top:20px;">
+
+<button
+class="print-button"
+onclick="printReport()">
+
+🖨️
+
+<span
+data-en="Print Report"
+data-ta="அறிக்கையை அச்சிடவும்">
+Print Report
+</span>
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- HISTORY -->
+
+<section
+class="card"
+id="historySection">
+
+<h2>
+
+📜
+
+<span
+data-en="Analysis History"
+data-ta="பகுப்பாய்வு வரலாறு">
+Analysis History
+</span>
+
+</h2>
+
+<div id="historyList"></div>
+
+<div style="text-align:center;">
+
+<button
+class="clear-button"
+onclick="clearHistory()">
+
+🗑️
+
+<span
+data-en="Clear History"
+data-ta="வரலாற்றை அழிக்கவும்">
+Clear History
+</span>
+
+</button>
+
+</div>
+
+</section>
+
+
+<div class="footer">
+
+<span
+data-en="AI Skin Disease Detection Project"
+data-ta="AI தோல் நோய் கண்டறிதல் திட்டம்">
+AI Skin Disease Detection Project
+</span>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* LANGUAGE */
+
+let currentLanguage =
+localStorage.getItem("skinLanguage") || "en";
+
+
+const translations = {
+
+en:{
+
+waiting:"Waiting for analysis",
+
+good:"🟢 Good",
+
+attention:"🟡 Needs Attention",
+
+recommended:"🔴 Attention Recommended",
+
+analysisFailed:"❌ Analysis Failed: ",
+
+cameraPermission:"❌ Camera could not be opened. Please allow camera permission.",
+
+cameraReady:"Camera is ready. Click Capture Image.",
+
+openCamera:"🔴 Camera On",
+
+captureFirst:"Please open the camera first.",
+
+captured:"✅ Image captured. Click Analyze Skin.",
+
+uploadFirst:"⚠️ Please upload an image or capture an image first.",
+
+analyzing:"AI is analyzing the image. Please wait...",
+
+completed:"✅ Analysis completed successfully.",
+
+noHistory:"No analysis history yet.",
+
+clearConfirm:"Are you sure you want to clear all history?",
+
+analyzeFirst:"Please analyze an image first.",
+
+qualityGood:"✅ Good image quality. You can analyze this image.",
+
+qualityBlur:"⚠️ Image may be unclear or blurry. Please use a clearer close-up image.",
+
+qualityDark:"⚠️ Image is too dark. Please take the image in better lighting.",
+
+qualitySmall:"⚠️ Image resolution is too low. Please choose a higher-quality image.",
+
+qualityChecking:"🔍 Checking image quality...",
+
+profileSaved:"✅ Patient profile saved successfully.",
+
+profileRequired:"⚠️ Please enter the patient name.",
+
+selectGender:"Select Gender",
+
+optional:"Optional"
+
+},
+
+ta:{
+
+waiting:"பகுப்பாய்விற்காக காத்திருக்கிறது",
+
+good:"🟢 நல்லது",
+
+attention:"🟡 கவனம் தேவை",
+
+recommended:"🔴 கவனம் தேவை",
+
+analysisFailed:"❌ பகுப்பாய்வு தோல்வியடைந்தது: ",
+
+cameraPermission:"❌ கேமராவை திறக்க முடியவில்லை. கேமரா அனுமதியை வழங்கவும்.",
+
+cameraReady:"கேமரா தயாராக உள்ளது. படம் எடுக்கவும்.",
+
+openCamera:"🔴 கேமரா இயக்கத்தில் உள்ளது",
+
+captureFirst:"முதலில் கேமராவை திறக்கவும்.",
+
+captured:"✅ படம் எடுக்கப்பட்டது. Analyze Skin என்பதை அழுத்தவும்.",
+
+uploadFirst:"⚠️ முதலில் ஒரு படத்தை பதிவேற்றவும் அல்லது கேமராவில் படம் எடுக்கவும்.",
+
+analyzing:"AI படத்தை பகுப்பாய்வு செய்கிறது. தயவுசெய்து காத்திருக்கவும்...",
+
+completed:"✅ பகுப்பாய்வு வெற்றிகரமாக முடிந்தது.",
+
+noHistory:"இதுவரை பகுப்பாய்வு வரலாறு இல்லை.",
+
+clearConfirm:"அனைத்து வரலாற்றையும் அழிக்க விரும்புகிறீர்களா?",
+
+analyzeFirst:"முதலில் ஒரு படத்தை பகுப்பாய்வு செய்யவும்.",
+
+qualityGood:"✅ படத்தின் தரம் நன்றாக உள்ளது. இந்த படத்தை பகுப்பாய்வு செய்யலாம்.",
+
+qualityBlur:"⚠️ படம் தெளிவில்லாமல் இருக்கலாம். இன்னும் தெளிவான நெருக்கமான படத்தை பயன்படுத்தவும்.",
+
+qualityDark:"⚠️ படம் மிகவும் இருட்டாக உள்ளது. நல்ல வெளிச்சத்தில் படம் எடுக்கவும்.",
+
+qualitySmall:"⚠️ படத்தின் resolution மிகவும் குறைவாக உள்ளது. உயர் தரமான படத்தை தேர்வு செய்யவும்.",
+
+qualityChecking:"🔍 படத்தின் தரம் சரிபார்க்கப்படுகிறது...",
+
+profileSaved:"✅ நோயாளர் விவரங்கள் வெற்றிகரமாக சேமிக்கப்பட்டது.",
+
+profileRequired:"⚠️ நோயாளியின் பெயரை உள்ளிடவும்.",
+
+selectGender:"பாலினத்தை தேர்வு செய்யவும்",
+
+optional:"விருப்பம்"
+
+}
+
+};
+
+
+/* LANGUAGE FUNCTIONS */
+
+function changeLanguage(language){
+
+currentLanguage=language;
+
+localStorage.setItem(
+"skinLanguage",
+language
+);
+
+applyLanguage();
+
+displayHistory();
+
+}
+
+
+function applyLanguage(){
+
+document.querySelectorAll(
+"[data-en][data-ta]"
+).forEach(function(element){
+
+if(currentLanguage==="ta"){
+
+element.innerText =
+element.getAttribute("data-ta");
+
+}
+else{
+
+element.innerText =
+element.getAttribute("data-en");
+
+}
+
+});
+
+
+document.documentElement.lang =
+currentLanguage==="ta"
+? "ta"
+: "en";
+
+
+const languageSelect =
+document.getElementById("languageSelect");
+
+if(languageSelect){
+
+languageSelect.value =
+currentLanguage;
+
+}
+
+
+/* UPDATE PLACEHOLDERS */
+
+document.getElementById("patientName").placeholder =
+currentLanguage==="ta"
+? "நோயாளியின் பெயரை உள்ளிடவும்"
+: "Enter patient name";
+
+document.getElementById("patientAge").placeholder =
+currentLanguage==="ta"
+? "வயதை உள்ளிடவும்"
+: "Enter age";
+
+document.getElementById("patientContact").placeholder =
+t("optional");
+
+document.getElementById("patientNotes").placeholder =
+currentLanguage==="ta"
+? "விருப்ப குறிப்புகள்"
+: "Optional notes";
+
+
+const genderSelect =
+document.getElementById("patientGender");
+
+if(genderSelect){
+
+genderSelect.options[0].text =
+t("selectGender");
+
+}
+
+}
+
+
+function t(key){
+
+return translations[currentLanguage][key];
+
+}
+
+
+/* ELEMENTS */
+
+const imageUpload =
+document.getElementById("imageUpload");
+
+const previewImage =
+document.getElementById("previewImage");
+
+const camera =
+document.getElementById("camera");
+
+const canvas =
+document.getElementById("canvas");
+
+const capturedImage =
+document.getElementById("capturedImage");
+
+const openCameraButton =
+document.getElementById("openCameraButton");
+
+const captureButton =
+document.getElementById("captureButton");
+
+const analyzeButton =
+document.getElementById("analyzeButton");
+
+const statusText =
+document.getElementById("status");
+
+const resultSection =
+document.getElementById("resultSection");
+
+const diseaseName =
+document.getElementById("diseaseName");
+
+const confidence =
+document.getElementById("confidence");
+
+const symptomsList =
+document.getElementById("symptomsList");
+
+const precautionsList =
+document.getElementById("precautionsList");
+
+const doctorAdvice =
+document.getElementById("doctorAdvice");
+
+const healthScore =
+document.getElementById("healthScore");
+
+const healthStatus =
+document.getElementById("healthStatus");
+
+const historySection =
+document.getElementById("historySection");
+
+const historyList =
+document.getElementById("historyList");
+
+const printDate =
+document.getElementById("printDate");
+
+const totalAnalyses =
+document.getElementById("totalAnalyses");
+
+const averageConfidence =
+document.getElementById("averageConfidence");
+
+const mostDetected =
+document.getElementById("mostDetected");
+
+const latestAnalysis =
+document.getElementById("latestAnalysis");
+
+const qualityBox =
+document.getElementById("qualityBox");
+
+const qualityMessage =
+document.getElementById("qualityMessage");
+
+
+const patientName =
+document.getElementById("patientName");
+
+const patientAge =
+document.getElementById("patientAge");
+
+const patientGender =
+document.getElementById("patientGender");
+
+const patientContact =
+document.getElementById("patientContact");
+
+const patientNotes =
+document.getElementById("patientNotes");
+
+const profileMessage =
+document.getElementById("profileMessage");
+
+
+const reportPatientName =
+document.getElementById("reportPatientName");
+
+const reportPatientAge =
+document.getElementById("reportPatientAge");
+
+const reportPatientGender =
+document.getElementById("reportPatientGender");
+
+const reportPatientContact =
+document.getElementById("reportPatientContact");
+
+const reportPatientNotes =
+document.getElementById("reportPatientNotes");
+
+
+let cameraStream=null;
+
+let capturedFile=null;
+
+
+/* PATIENT PROFILE */
+
+function savePatientProfile(){
+
+const name =
+patientName.value.trim();
+
+if(!name){
+
+profileMessage.innerText =
+t("profileRequired");
+
+profileMessage.className =
+"profile-message error";
+
+patientName.focus();
+
+return;
+
+}
+
+const profile={
+
+name:name,
+
+age:patientAge.value,
+
+gender:patientGender.value,
+
+contact:patientContact.value.trim(),
+
+notes:patientNotes.value.trim()
+
+};
+
+localStorage.setItem(
+"patientProfile",
+JSON.stringify(profile)
+);
+
+updatePatientReport();
+
+profileMessage.innerText =
+t("profileSaved");
+
+profileMessage.className =
+"profile-message";
+
+
+}
+
+
+function loadPatientProfile(){
+
+const profile =
+JSON.parse(
+localStorage.getItem(
+"patientProfile"
+)
+);
+
+if(!profile){
+return;
+}
+
+patientName.value =
+profile.name || "";
+
+patientAge.value =
+profile.age || "";
+
+patientGender.value =
+profile.gender || "";
+
+patientContact.value =
+profile.contact || "";
+
+patientNotes.value =
+profile.notes || "";
+
+updatePatientReport();
+
+}
+
+
+function updatePatientReport(){
+
+const name =
+patientName.value.trim();
+
+const age =
+patientAge.value;
+
+const gender =
+patientGender.value;
+
+const contact =
+patientContact.value.trim();
+
+const notes =
+patientNotes.value.trim();
+
+
+reportPatientName.innerText =
+name || "-";
+
+reportPatientAge.innerText =
+age || "-";
+
+reportPatientGender.innerText =
+gender || "-";
+
+reportPatientContact.innerText =
+contact || "-";
+
+reportPatientNotes.innerText =
+notes || "-";
+
+}
+
+
+/* IMAGE QUALITY CHECK */
+
+function checkImageQuality(file){
+
+return new Promise(function(resolve){
+
+qualityBox.style.display="block";
+
+qualityMessage.innerText =
+t("qualityChecking");
+
+qualityMessage.className =
+"quality-message loading";
+
+
+const image =
+new Image();
+
+image.onload=function(){
+
+const width =
+image.naturalWidth;
+
+const height =
+image.naturalHeight;
+
+
+if(
+width<200 ||
+height<200
+){
+
+qualityMessage.innerText =
+t("qualitySmall");
+
+qualityMessage.className =
+"quality-message quality-warning";
+
+resolve(false);
+
+return;
+
+}
+
+
+const canvasCheck =
+document.createElement("canvas");
+
+canvasCheck.width=100;
+
+canvasCheck.height=100;
+
+
+const ctx =
+canvasCheck.getContext("2d");
+
+ctx.drawImage(
+image,
+0,
+0,
+100,
+100
+);
+
+
+const imageData =
+ctx.getImageData(
+0,
+0,
+100,
+100
+).data;
+
+
+let brightness=0;
+
+
+for(
+let i=0;
+i<imageData.length;
+i+=4
+){
+
+brightness +=
+(
+imageData[i] +
+imageData[i+1] +
+imageData[i+2]
+) / 3;
+
+}
+
+
+brightness =
+brightness /
+(imageData.length/4);
+
+
+if(
+brightness<35
+){
+
+qualityMessage.innerText =
+t("qualityDark");
+
+qualityMessage.className =
+"quality-message quality-warning";
+
+resolve(false);
+
+return;
+
+}
+
+
+/* SIMPLE BLUR CHECK */
+
+const gray=[];
+
+
+for(
+let i=0;
+i<imageData.length;
+i+=4
+){
+
+gray.push(
+(
+0.299*imageData[i] +
+0.587*imageData[i+1] +
+0.114*imageData[i+2]
+)
+);
+
+}
+
+
+let difference=0;
+
+
+for(
+let y=1;
+y<99;
+y++
+){
+
+for(
+let x=1;
+x<99;
+x++
+){
+
+const index =
+y*100+x;
+
+difference +=
+Math.abs(
+gray[index] -
+gray[index-1]
+);
+
+difference +=
+Math.abs(
+gray[index] -
+gray[index-100]
+);
+
+}
+
+}
+
+
+const blurScore =
+difference /
+(98*98*2);
+
+
+if(
+blurScore<3
+){
+
+qualityMessage.innerText =
+t("qualityBlur");
+
+qualityMessage.className =
+"quality-message quality-warning";
+
+resolve(false);
+
+return;
+
+}
+
+
+qualityMessage.innerText =
+t("qualityGood");
+
+qualityMessage.className =
+"quality-message quality-good";
+
+resolve(true);
+
+};
+
+
+image.onerror=function(){
+
+qualityMessage.innerText =
+t("qualityBlur");
+
+qualityMessage.className =
+"quality-message quality-warning";
+
+resolve(false);
+
+};
+
+
+image.src =
+URL.createObjectURL(file);
+
+});
+
+}
+
+
+/* UPLOAD */
+
+imageUpload.addEventListener(
+"change",
+async function(){
+
+const file =
+this.files[0];
+
+if(!file){
+return;
+}
+
+capturedFile=null;
+
+previewImage.src =
+URL.createObjectURL(file);
+
+previewImage.style.display =
+"block";
+
+capturedImage.style.display =
+"none";
+
+resultSection.style.display =
+"none";
+
+statusText.innerText="";
+
+await checkImageQuality(file);
+
+}
+);
+
+
+/* CAMERA */
+
+async function openCamera(){
+
+try{
+
+if(
+!navigator.mediaDevices ||
+!navigator.mediaDevices.getUserMedia
+){
+
+throw new Error(
+"Camera is not supported."
+);
+
+}
+
+
+cameraStream =
+await navigator.mediaDevices.getUserMedia({
+
+video:{
+facingMode:"environment"
+},
+
+audio:false
+
+});
+
+
+camera.srcObject =
+cameraStream;
+
+camera.style.display =
+"block";
+
+captureButton.style.display =
+"inline-block";
+
+openCameraButton.innerText =
+t("openCamera");
+
+statusText.innerText =
+t("cameraReady");
+
+statusText.className =
+"loading";
+
+}
+
+catch(error){
+
+console.error(error);
+
+statusText.innerText =
+t("cameraPermission");
+
+statusText.className =
+"error";
+
+}
+
+}
+
+
+/* CAPTURE */
+
+async function capturePhoto(){
+
+if(!cameraStream){
+
+statusText.innerText =
+t("captureFirst");
+
+statusText.className =
+"error";
+
+return;
+
+}
+
+
+canvas.width =
+camera.videoWidth;
+
+canvas.height =
+camera.videoHeight;
+
+
+const context =
+canvas.getContext("2d");
+
+
+context.drawImage(
+camera,
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+
+canvas.toBlob(
+async function(blob){
+
+capturedFile =
+new File(
+[blob],
+"skin-camera.jpg",
+{
+type:"image/jpeg"
+}
+);
+
+
+capturedImage.src =
+URL.createObjectURL(blob);
+
+capturedImage.style.display =
+"block";
+
+previewImage.style.display =
+"none";
+
+imageUpload.value="";
+
+
+statusText.innerText =
+t("captured");
+
+statusText.className =
+"success";
+
+
+await checkImageQuality(
+capturedFile
+);
+
+},
+"image/jpeg",
+0.95
+);
+
+}
+
+
+/* HEALTH SCORE */
+
+function calculateHealthScore(
+disease,
+confidenceValue
+){
+
+let score;
+
+
+if(
+disease.toLowerCase()==="normal"
+){
+
+score =
+Math.round(
+Math.min(
+100,
+70 + confidenceValue*0.30
+)
+);
+
+}
+else{
+
+score =
+Math.round(
+Math.max(
+20,
+100 - confidenceValue*0.70
+)
+);
+
+}
+
+
+return score;
+
+}
+
+
+function updateHealthScore(
+disease,
+confidenceValue
+){
+
+const score =
+calculateHealthScore(
+disease,
+confidenceValue
+);
+
+
+healthScore.innerText =
+score+"/100";
+
+
+if(score>=80){
+
+healthStatus.innerText =
+t("good");
+
+}
+
+else if(score>=50){
+
+healthStatus.innerText =
+t("attention");
+
+}
+
+else{
+
+healthStatus.innerText =
+t("recommended");
+
+}
+
+
+return score;
+
+}
+
+
+/* SAVE HISTORY */
+
+function saveHistory(
+disease,
+confidenceValue,
+score
+){
+
+let history =
+JSON.parse(
+localStorage.getItem(
+"skinAnalysisHistory"
+)
+)||[];
+
+
+history.unshift({
+
+disease:disease,
+
+confidence:confidenceValue,
+
+score:score,
+
+date:new Date().toLocaleString()
+
+});
+
+
+if(history.length>20){
+
+history =
+history.slice(0,20);
+
+}
+
+
+localStorage.setItem(
+"skinAnalysisHistory",
+JSON.stringify(history)
+);
+
+
+displayHistory();
+
+updateDashboard();
+
+}
+
+
+/* DASHBOARD */
+
+function updateDashboard(){
+
+const history =
+JSON.parse(
+localStorage.getItem(
+"skinAnalysisHistory"
+)
+)||[];
+
+
+if(history.length===0){
+
+totalAnalyses.innerText="0";
+
+averageConfidence.innerText="0%";
+
+mostDetected.innerText="-";
+
+latestAnalysis.innerText="-";
+
+return;
+
+}
+
+
+totalAnalyses.innerText =
+history.length;
+
+
+let totalConfidence=0;
+
+
+history.forEach(function(record){
+
+totalConfidence +=
+Number(record.confidence)||0;
+
+});
+
+
+const average =
+totalConfidence /
+history.length;
+
+
+averageConfidence.innerText =
+average.toFixed(2)+"%";
+
+
+const counts={};
+
+
+history.forEach(function(record){
+
+const disease =
+record.disease;
+
+counts[disease] =
+(counts[disease]||0)+1;
+
+});
+
+
+let mostCommon="-";
+
+let highestCount=0;
+
+
+for(
+const disease in counts
+){
+
+if(
+counts[disease]>highestCount
+){
+
+highestCount =
+counts[disease];
+
+mostCommon =
+disease;
+
+}
+
+}
+
+
+mostDetected.innerText =
+mostCommon;
+
+
+latestAnalysis.innerText =
+history[0].disease;
+
+}
+
+
+/* DISPLAY HISTORY */
+
+function displayHistory(){
+
+const history =
+JSON.parse(
+localStorage.getItem(
+"skinAnalysisHistory"
+)
+)||[];
+
+
+historyList.innerHTML="";
+
+
+if(history.length===0){
+
+historyList.innerHTML =
+'<div class="no-history">'+
+t("noHistory")+
+'</div>';
+
+return;
+
+}
+
+
+history.forEach(function(record){
+
+const item =
+document.createElement("div");
+
+item.className =
+"history-item";
+
+
+const confidenceText =
+currentLanguage==="ta"
+? "நம்பகத்தன்மை"
+: "Confidence";
+
+
+const scoreText =
+currentLanguage==="ta"
+? "தோல் ஆரோக்கிய மதிப்பெண்"
+: "Skin Health Score";
+
+
+item.innerHTML = `
+
+<h3>🩺 ${record.disease}</h3>
+
+<p>
+📊 ${confidenceText}:
+<strong>${record.confidence}%</strong>
+</p>
+
+<p>
+⭐ ${scoreText}:
+<strong>${record.score}/100</strong>
+</p>
+
+<p class="history-date">
+🕐 ${record.date}
+</p>
+
+`;
+
+
+historyList.appendChild(item);
+
+});
+
+}
+
+
+/* SHOW HISTORY */
+
+function showHistory(){
+
+historySection.style.display =
+"block";
+
+
+displayHistory();
+
+
+historySection.scrollIntoView({
+behavior:"smooth"
+});
+
+}
+
+
+/* CLEAR HISTORY */
+
+function clearHistory(){
+
+if(
+!confirm(
+t("clearConfirm")
+)
+){
+
+return;
+
+}
+
+
+localStorage.removeItem(
+"skinAnalysisHistory"
+);
+
+
+displayHistory();
+
+updateDashboard();
+
+}
+
+
+/* ANALYZE */
+
+async function analyzeSkin(){
+
+/* SAVE PROFILE FIRST */
+
+const name =
+patientName.value.trim();
+
+
+if(!name){
+
+profileMessage.innerText =
+t("profileRequired");
+
+profileMessage.className =
+"profile-message error";
+
+patientName.focus();
+
+return;
+
+}
+
+
+savePatientProfile();
+
+
+let file =
+capturedFile ||
+imageUpload.files[0];
+
+
+if(!file){
+
+statusText.innerText =
+t("uploadFirst");
+
+statusText.className =
+"error";
+
+return;
+
+}
+
+
+/* UPDATE REPORT PROFILE */
+
+updatePatientReport();
+
+
+/* QUALITY CHECK BEFORE AI */
+
+const qualityPassed =
+await checkImageQuality(file);
+
+
+if(!qualityPassed){
+
+statusText.innerText =
+currentLanguage==="ta"
+? "⚠️ படத்தின் தரம் சரியாக இல்லை. முதலில் தெளிவான படத்தை தேர்வு செய்யவும்."
+: "⚠️ Image quality is not good enough. Please choose a clearer image.";
+
+statusText.className =
+"error";
+
+return;
+
+}
+
+
+analyzeButton.disabled=true;
+
+
+analyzeButton.innerText =
+currentLanguage==="ta"
+? "⏳ பகுப்பாய்வு..."
+: "⏳ Analyzing...";
+
+
+statusText.innerText =
+t("analyzing");
+
+statusText.className =
+"loading";
+
+
+resultSection.style.display =
+"none";
+
+
+const formData =
+new FormData();
+
+
+formData.append(
+"image",
+file
+);
+
+
+try{
+
+const response =
+await fetch(
+"http://127.0.0.1:5000/predict",
+{
+method:"POST",
+body:formData
+}
+);
+
+
+const data =
+await response.json();
+
+
+if(
+!response.ok ||
+!data.success
+){
+
+throw new Error(
+data.error ||
+"Analysis failed"
+);
+
+}
+
+
+diseaseName.innerText =
+data.disease;
+
+
+confidence.innerText =
+data.confidence+"%";
+
+
+symptomsList.innerHTML="";
+
+
+data.symptoms.forEach(
+function(symptom){
+
+const li =
+document.createElement("li");
+
+li.innerText =
+symptom;
+
+symptomsList.appendChild(li);
+
+}
+);
+
+
+precautionsList.innerHTML="";
+
+
+data.precautions.forEach(
+function(precaution){
+
+const li =
+document.createElement("li");
+
+li.innerText =
+precaution;
+
+precautionsList.appendChild(li);
+
+}
+);
+
+
+doctorAdvice.innerText =
+data.doctor;
+
+
+/* PATIENT REPORT */
+
+updatePatientReport();
+
+
+const score =
+updateHealthScore(
+data.disease,
+Number(data.confidence)
+);
+
+
+printDate.innerText =
+currentLanguage==="ta"
+? "உருவாக்கப்பட்ட தேதி: "+
+new Date().toLocaleString()
+: "Generated on: "+
+new Date().toLocaleString();
+
+
+resultSection.style.display =
+"block";
+
+
+saveHistory(
+data.disease,
+Number(data.confidence),
+score
+);
+
+
+statusText.innerText =
+t("completed");
+
+statusText.className =
+"success";
+
+}
+
+
+catch(error){
+
+console.error(error);
+
+
+statusText.innerText =
+t("analysisFailed")+
+error.message;
+
+statusText.className =
+"error";
+
+
+healthScore.innerText =
+"Not Available";
+
+
+healthStatus.innerText =
+currentLanguage==="ta"
+? "பகுப்பாய்வு தோல்வியடைந்தது"
+: "Analysis failed";
+
+}
+
+
+finally{
+
+analyzeButton.disabled=false;
+
+
+analyzeButton.innerText =
+currentLanguage==="ta"
+? "🔬 தோலை பகுப்பாய்வு செய்யவும்"
+: "🔬 Analyze Skin";
+
+}
+
+}
+
+
+/* PRINT */
+
+function printReport(){
+
+if(
+resultSection.style.display==="none"
+){
+
+alert(
+t("analyzeFirst")
+);
+
+return;
+
+}
+
+
+window.print();
+
+}
+
+
+/* RESET */
+
+function resetPage(){
+
+imageUpload.value="";
+
+capturedFile=null;
+
+previewImage.src="";
+
+previewImage.style.display =
+"none";
+
+capturedImage.src="";
+
+capturedImage.style.display =
+"none";
+
+resultSection.style.display =
+"none";
+
+qualityBox.style.display =
+"none";
+
+qualityMessage.innerText="";
+
+statusText.innerText="";
+
+healthScore.innerText =
+"0/100";
+
+healthStatus.innerText =
+t("waiting");
+
+profileMessage.innerText="";
+
+}
+
+
+/* LOAD */
+
+loadPatientProfile();
+
+displayHistory();
+
+updateDashboard();
+
+applyLanguage();
+
+</script>
+
+</body>
+</html>
