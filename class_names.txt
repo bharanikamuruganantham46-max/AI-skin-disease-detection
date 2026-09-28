@@ -1,0 +1,7 @@
+acne
+eczema
+normal
+psoriasis
+rosacea
+seborrheic_keratosis
+vitiligo
