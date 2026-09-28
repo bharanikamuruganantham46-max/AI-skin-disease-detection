@@ -6,8 +6,8 @@ from PIL import Image
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 app = Flask(__name__)
-CORS(app)
 
+CORS(app, resources={r"/*": {"origins": "*"}})
 MODEL_PATH = "skin_disease_model.keras"
 
 # Load AI model
